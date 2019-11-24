@@ -1,0 +1,8 @@
+app_identifier("com.nexxtway.ReactNativeRainbowApp") # TODO: set your app identifier
+apple_id(ENV["APPLE_ID"]) # TODO: set your Apple ID
+
+itc_team_id(ENV["ITC_TEAM_ID"]) # TODO: set App Store Connect Team ID
+team_id(ENV["TEAM_ID"]) # TODO: set Developer Portal Team ID
+
+# For more information about the Appfile, see:
+#     https://docs.fastlane.tools/advanced/#appfile

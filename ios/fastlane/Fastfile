@@ -1,0 +1,100 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
+
+# Uncomment the line if you want fastlane to automatically update itself
+# update_fastlane
+
+default_platform(:ios)
+
+# Constants
+XCODEPROJ = "ReactNativeRainbowApp.xcodeproj" # TODO: set xcodeproj
+XCWORKSPACE = "ReactNativeRainbowApp.xcworkspace" # TODO: set xcworkspace
+SCHEME = "ReactNativeRainbowApp" # TODO: set scheme
+
+platform :ios do
+  before_all do
+    setup_circle_ci
+  end
+
+  desc "Push a new beta build to TestFlight"
+  lane :beta do
+    ensure_git_status_clean
+
+    increment_build_number(
+      build_number: latest_testflight_build_number + 1,
+      xcodeproj: XCODEPROJ
+    )
+
+    match(type: "app-store")
+
+    build_app(
+        workspace: XCWORKSPACE,
+        scheme: SCHEME,
+        clean: true,
+        export_method: "app-store",
+    )
+    upload_to_testflight
+
+    # commit_version_bump(xcodeproj: XCODEPROJ)
+    # add_git_tag(
+    #     tag: "version-bump"
+    # )
+    # push_to_git_remote
+  end
+
+  # before excecute this lane comment setup_circle_ci in before_all block
+  lane :beta_from_local_machine do
+    PROVISIONIG_PROFILE_FILE_NAME = "" # TODO: set provisioning profile file name
+    OUTPUT_PATH = "" # TODO: set output path e.g "./builds" or "./output"
+    TARGET = "" # TODO: set target
+
+    increment_build_number(
+      build_number: latest_testflight_build_number + 1,
+      xcodeproj: XCODEPROJ
+    )
+
+    get_certificates(
+      output_path: OUTPUT_PATH
+    )
+    get_provisioning_profile(
+      output_path: OUTPUT_PATH,
+      filename: PROVISIONIG_PROFILE_FILE_NAME,
+    )
+    update_project_provisioning(
+      xcodeproj: XCODEPROJ,
+      target_filter: TARGET,
+      profile: OUTPUT_PATH + "/" + PROVISIONIG_PROFILE_FILE_NAME,
+      build_configuration: "Release"
+    )
+    update_project_team(
+      teamid: CredentialsManager::AppfileConfig.try_fetch_value(:team_id)
+    )
+
+    # add beta badge to app icon, needs to install badge plugin
+    # add_badge
+
+    build_app(
+        workspace: XCWORKSPACE,
+        scheme: SCHEME,
+        clean: true,
+        export_method: "app-store",
+        export_options: {
+            provisioningProfiles: { 
+                CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier) => CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier) + " AppStore"
+            }
+        },
+        build_path: OUTPUT_PATH,
+        output_directory: OUTPUT_PATH
+    )
+    upload_to_testflight
+  end
+end
