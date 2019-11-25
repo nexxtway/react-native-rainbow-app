@@ -1,24 +1,5 @@
 version: 2
 
-defaults: &defaults
-    - restore_cache:
-        key: yarn-v1-{{ checksum "yarn.lock" }}-{{ arch }}
-
-    - restore_cache:
-        key: node-v1-{{ checksum "package.json" }}-{{ arch }}
-
-    - run: yarn install
-
-    - save_cache:
-        key: yarn-v1-{{ checksum "yarn.lock" }}-{{ arch }}
-        paths:
-            - ~/.cache/yarn
-
-    - save_cache:
-        key: node-v1-{{ checksum "package.json" }}-{{ arch }}
-        paths:
-            - node_modules
-
 jobs:
   node:
     working_directory: ~/repo
@@ -27,7 +8,23 @@ jobs:
     steps:
       - checkout
 
-      <<: *defaults
+      - restore_cache:
+          key: yarn-v1-{{ checksum "yarn.lock" }}-{{ arch }}
+
+      - restore_cache:
+          key: node-v1-{{ checksum "package.json" }}-{{ arch }}
+
+      - run: yarn install
+
+      - save_cache:
+          key: yarn-v1-{{ checksum "yarn.lock" }}-{{ arch }}
+          paths:
+              - ~/.cache/yarn
+
+      - save_cache:
+          key: node-v1-{{ checksum "package.json" }}-{{ arch }}
+          paths:
+              - node_modules
 
       - run: yarn lint
 
@@ -59,7 +56,23 @@ jobs:
     steps:
       - checkout
 
-      <<: *defaults
+      - restore_cache:
+          key: yarn-v1-{{ checksum "yarn.lock" }}-{{ arch }}
+
+      - restore_cache:
+          key: node-v1-{{ checksum "package.json" }}-{{ arch }}
+
+      - run: yarn install
+
+      - save_cache:
+          key: yarn-v1-{{ checksum "yarn.lock" }}-{{ arch }}
+          paths:
+              - ~/.cache/yarn
+
+      - save_cache:
+          key: node-v1-{{ checksum "package.json" }}-{{ arch }}
+          paths:
+              - node_modules
 
       - restore_cache:
           key: bundle-v1-{{ checksum "ios/Gemfile.lock" }}-{{ arch }}
