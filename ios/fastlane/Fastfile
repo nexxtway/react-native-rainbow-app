@@ -39,10 +39,11 @@ platform :ios do
     build_app(
         workspace: XCWORKSPACE,
         scheme: SCHEME,
-        clean: true,
         export_method: "app-store",
     )
-    upload_to_testflight
+    upload_to_testflight(
+      skip_waiting_for_build_processing: 1
+    )
 
     # uncomment this and ensure_git_status_clean line to commit the bumb version
     # commit_version_bump(xcodeproj: XCODEPROJ)
@@ -96,6 +97,8 @@ platform :ios do
         build_path: OUTPUT_PATH,
         output_directory: OUTPUT_PATH
     )
-    upload_to_testflight
+    upload_to_testflight(
+      skip_waiting_for_build_processing: 1
+    )
   end
 end

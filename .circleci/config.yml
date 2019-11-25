@@ -54,15 +54,10 @@ jobs:
       FL_OUTPUT_DIR: output
       FASTLANE_LANE: beta
 
-    # use a --login shell so our "set Ruby version" command gets picked up for later steps
-    # shell: /bin/bash --login -o pipefail
+    shell: /bin/bash --login -o pipefail
 
     steps:
       - checkout
-
-      # - run:
-      #     name: set Ruby version
-      #     command:  echo "ruby-2.4" > ~/.ruby-version
 
       <<: *defaults
 
@@ -71,6 +66,10 @@ jobs:
 
       - run:
           command: bundle install
+          working_directory: ios
+
+      - run:
+          command: bundle update fastlane
           working_directory: ios
 
       - save_cache:
